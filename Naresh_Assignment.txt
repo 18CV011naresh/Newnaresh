@@ -1,0 +1,74 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Student 
+{
+    private int id;
+    private String name;
+    private int totalMarks;
+
+    public static List<Student> loadStudentDetails(int pageNumber, int pageSize) 
+	{
+        List<Student> allStudents = readStudentDetailsFromFile();
+        int startIndex = (pageNumber - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, allStudents.size());
+
+        if (startIndex >= endIndex || startIndex < 0) 
+	 {
+            return new ArrayList<>(); 
+        }
+
+        return allStudents.subList(startIndex, endIndex);
+    }
+
+    public static List<Student> filterStudents(String filterCriteria) 
+  {
+        List<Student> allStudents = readStudentDetailsFromFile(); 
+        List<Student> filteredStudents = new ArrayList<>();
+
+        
+        for (Student student : allStudents) 
+	{
+            if (student.matchesFilterCriteria(filterCriteria)) 
+		{
+                filteredStudents.add(student);
+            }
+        }
+
+        return filteredStudents;
+    }
+
+    private static List<Student> readStudentDetailsFromFile() 
+{
+        List<Student> students = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader("student_data.csv"))) 
+	{
+            String line;
+            while ((line = br.readLine()) != null)
+		 {
+                String[] data = line.split(",");
+                int id = Integer.parseInt(data[0]);
+                String name = data[1];
+                int totalMarks = Integer.parseInt(data[2]);
+
+                Student student = new Student(id, name, totalMarks);
+                students.add(student);
+            }
+        } 
+		catch (IOException e) 
+	  {
+            e.printStackTrace();
+        }
+
+        return students;
+    }
+
+    private boolean matchesFilterCriteria(String filterCriteria) 
+   {
+        return name.toLowerCase().contains(filterCriteria.toLowerCase());
+    }
+}
